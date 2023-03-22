@@ -68,3 +68,46 @@ func (d *Database) PostComment(ctx context.Context, cmt comment.Comment) (commen
 
 	return cmt, nil
 }
+
+func (d *Database) DeleteComment(ctx context.Context, id string) error {
+	_, err := d.Client.ExecContext(
+		ctx,
+		`DELETE FROM comments where id = $1`,
+		id,
+	)
+	if err != nil {
+		return fmt.Errorf("error deleting comment: %w", err)
+	}
+
+	return nil
+}
+
+func (d *Database) UpdateComment(
+	ctx context.Context,
+	id string,
+	cmt comment.Comment,
+) (comment.Comment, error) {
+	cmtRow := CommentRow{
+		ID:     id,
+		Slug:   sql.NullString{String: cmt.Slug, Valid: true},
+		Author: sql.NullString{String: cmt.Author, Valid: true},
+		Body:   sql.NullString{String: cmt.Body, Valid: true},
+	}
+
+	rows, err := d.Client.NamedQueryContext(
+		ctx,
+		`UPDATE comments
+		SET slug = :slug, body = :body, author = :author
+		WHERE id = :id`,
+		cmtRow,
+	)
+
+	if err != nil {
+		return comment.Comment{}, fmt.Errorf("error updating comment: %w", err)
+	}
+	if err := rows.Close(); err != nil {
+		return comment.Comment{}, fmt.Errorf("error closing rows: %w", err)
+	}
+
+	return convertCommentRowToComment(cmtRow), nil
+}
