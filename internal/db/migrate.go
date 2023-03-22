@@ -29,7 +29,9 @@ func (d *Database) MigrateDB() error {
 	}
 
 	if err := m.Up(); err != nil {
-		return fmt.Errorf("failed to migrate: %w", err)
+		if err != migrate.ErrNoChange {
+			return fmt.Errorf("failed to migrate database: %w", err)
+		}
 	}
 
 	fmt.Println("Migrated database successfully")
