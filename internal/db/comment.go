@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/RianNegreiros/clean-go-rest-api/internal/comment"
+	"github.com/google/uuid"
 )
 
 type CommentRow struct {
@@ -41,4 +42,29 @@ func (d *Database) GetComment(
 	}
 
 	return convertCommentRowToComment(cmtRow), nil
+}
+
+func (d *Database) PostComment(ctx context.Context, cmt comment.Comment) (comment.Comment, error) {
+	cmt.ID = uuid.New().String()
+	postRow := CommentRow{
+		ID:     cmt.ID,
+		Slug:   sql.NullString{String: cmt.Slug, Valid: true},
+		Author: sql.NullString{String: cmt.Author, Valid: true},
+		Body:   sql.NullString{String: cmt.Body, Valid: true},
+	}
+	rows, err := d.Client.NamedQueryContext(
+		ctx,
+		`INSERT INTO comments 
+		(id, slug, body, author)
+		VALUES (:id, :slug, :body, :author)`,
+		postRow,
+	)
+	if err != nil {
+		return comment.Comment{}, fmt.Errorf("error inserting comment: %w", err)
+	}
+	if err := rows.Close(); err != nil {
+		return comment.Comment{}, fmt.Errorf("error closing rows: %w", err)
+	}
+
+	return cmt, nil
 }
