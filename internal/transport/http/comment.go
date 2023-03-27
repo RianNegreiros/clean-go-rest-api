@@ -11,7 +11,7 @@ import (
 )
 
 type CommentService interface {
-	CreateComment(context.Context, comment.Comment) (comment.Comment, error)
+	PostComment(context.Context, comment.Comment) (comment.Comment, error)
 	GetComment(ctx context.Context, ID string) (comment.Comment, error)
 	UpdateComment(ctx context.Context, ID string, newCmt comment.Comment) (comment.Comment, error)
 	DeleteComment(ctx context.Context, ID string) error
@@ -21,14 +21,14 @@ type Response struct {
 	Message string
 }
 
-func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostComment(w http.ResponseWriter, r *http.Request) {
 	var cmt comment.Comment
 	if err := json.NewDecoder(r.Body).Decode(&cmt); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	cmt, err := h.Service.CreateComment(r.Context(), cmt)
+	cmt, err := h.Service.PostComment(r.Context(), cmt)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

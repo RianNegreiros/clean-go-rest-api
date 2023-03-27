@@ -22,7 +22,7 @@ type Comment struct {
 // Store interface defines all of the methods needs
 type Store interface {
 	GetComment(context.Context, string) (Comment, error)
-	CreateComment(context.Context, Comment) (Comment, error)
+	PostComment(context.Context, Comment) (Comment, error)
 	UpdateComment(context.Context, string, Comment) (Comment, error)
 	DeleteComment(context.Context, string) error
 }
@@ -51,8 +51,8 @@ func (s *Service) GetComment(ctx context.Context, id string) (Comment, error) {
 	return cmt, nil
 }
 
-func (s *Service) CreateComment(ctx context.Context, cmt Comment) (Comment, error) {
-	cmt, err := s.Store.CreateComment(ctx, cmt)
+func (s *Service) PostComment(ctx context.Context, cmt Comment) (Comment, error) {
+	cmt, err := s.Store.PostComment(ctx, cmt)
 	if err != nil {
 		return Comment{}, err
 	}

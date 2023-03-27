@@ -38,7 +38,7 @@ func (h *Handler) mapRoutes() {
 		fmt.Fprintf(w, "Working")
 	})
 
-	h.Router.HandleFunc("/api/v1/comment", h.CreateComment).Methods("POST")
+	h.Router.HandleFunc("/api/v1/comment", h.PostComment).Methods("POST")
 	h.Router.HandleFunc("/api/v1/comment/{id}", h.GetComment).Methods("GET")
 	h.Router.HandleFunc("/api/v1/comment/{id}", h.UpdateComment).Methods("PUT")
 	h.Router.HandleFunc("/api/v1/comment/{id}", h.DeleteComment).Methods("DELETE")
