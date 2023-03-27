@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/RianNegreiros/clean-go-rest-api/internal/comment"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -21,20 +22,42 @@ type Response struct {
 	Message string
 }
 
+type PostCommentRequest struct {
+	Slug   string `json:"slug" validate:"required"`
+	Author string `json:"author" validate:"required"`
+	Body   string `json:"body" validate:"required"`
+}
+
+func convertPostCommentRequestToComment(req PostCommentRequest) comment.Comment {
+	return comment.Comment{
+		Slug:   req.Slug,
+		Author: req.Author,
+		Body:   req.Body,
+	}
+}
+
 func (h *Handler) PostComment(w http.ResponseWriter, r *http.Request) {
-	var cmt comment.Comment
+	var cmt PostCommentRequest
 	if err := json.NewDecoder(r.Body).Decode(&cmt); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	cmt, err := h.Service.PostComment(r.Context(), cmt)
+	validate := validator.New()
+	if err := validate.Struct(cmt); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	convertComment := convertPostCommentRequestToComment(cmt)
+
+	postCommentRequest, err := h.Service.PostComment(r.Context(), convertComment)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(cmt); err != nil {
+	if err := json.NewEncoder(w).Encode(postCommentRequest); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
