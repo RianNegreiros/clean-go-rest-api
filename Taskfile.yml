@@ -29,3 +29,8 @@ tasks:
       DB_PORT: 5432
       DB_DB: postgres
       SSL_MODE: disable
+
+  acceptance-tests:
+    cmds:
+      - docker-compose up -d --build
+      - go test -tags=e2e -v ./...
