@@ -61,7 +61,11 @@ func (h *Handler) Serve() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	h.Server.Shutdown(ctx)
+
+	if err := h.Server.Shutdown(ctx); err != nil {
+		log.Println(err.Error())
+		return err
+	}
 
 	log.Println("shutting down")
 
