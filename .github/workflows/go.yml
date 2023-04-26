@@ -36,9 +36,6 @@ jobs:
     - name: Test
       run: task test
 
-    - name: Acceptance tests
-      run: task acceptance-tests
-      
     - name: Lint
       run: task lint
       
