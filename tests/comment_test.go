@@ -24,11 +24,6 @@ func createToken() string {
 }
 
 func TestPostComment(t *testing.T) {
-	if err := db.MigrateDB(); err != nil {
-		fmt.Println("Failed to migrate database")
-		return err
-	}
-
 	t.Run("Create a comment", func(t *testing.T) {
 		client := resty.New()
 		resp, err := client.R().

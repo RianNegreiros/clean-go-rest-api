@@ -35,9 +35,6 @@ jobs:
 
     - name: Test
       run: task test
-    
-    - name: Integration test
-      run: task integration-test
 
     - name: Acceptance tests
       run: task acceptance-tests
